@@ -9,21 +9,23 @@ namespace Mnogougolniki.Figures
 {
     public abstract class Shape
     {
-        protected bool InSide = false;
-        protected static int r;
+        public abstract bool InSide(int nx, int ny);
+        protected static readonly int r;
         protected int x, y;
-        protected Color color;
-
-        protected Shape(int x, int y, Color color)
+        protected static Color color;
+        
+        public bool Moving {get; set;}
+        protected Shape(int x, int y)
         {
             this.x = x;
             this.y = y;
-            this.color = color;
+            
         }
 
         static Shape()
         {
             r = 30;
+            color = Colors.Chocolate;
         }
 
         public int X

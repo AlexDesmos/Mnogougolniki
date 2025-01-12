@@ -10,10 +10,16 @@ using Point = Avalonia.Point;
 
 namespace Mnogougolniki.Figures
 {
-    internal class Square : Shape
+    public sealed class Square : Shape
     {
-        public Square(int x, int y, Color color): base(x, y, color){}
-        
+        private Point point1, point2, point3, point4;   
+        private static float InR => r / (float)Math.Sqrt(2);
+        public Square(int x, int y) : base(x, y) { }
+
+        public override bool InSide(int newX, int newY)
+        {
+           return x - InR <= newX && newY <= x + InR && y - InR <= newY && newY <= y + InR;
+        }
         public override void Draw(DrawingContext context)
         {
             Brush lineBrush = new SolidColorBrush(color);

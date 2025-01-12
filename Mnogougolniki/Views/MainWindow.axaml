@@ -8,8 +8,20 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Mnogougolniki.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
+        PointerPressed="OnPointerPressed"
+        PointerMoved="OnPointerMoved"
+        PointerReleased="OnPointerReleased"
         Title="Mnogougolniki">
         
-
-        <Mnogougolniki:Controls Name="MyCustomControls"></Mnogougolniki:Controls> 
+        <Design.DataContext>
+                <vm:MainViewModel />
+        </Design.DataContext>
+        <DockPanel>
+                <Menu DockPanel.Dock="Top">
+                        <MenuItem Header="Figure type">
+                                <ListBox x:Name="Figures" SelectionChanged="Figures_OnSelectionChanged"></ListBox>
+                        </MenuItem>
+                </Menu>
+                <Mnogougolniki:Controls Name="MyCustomControls"></Mnogougolniki:Controls> 
+        </DockPanel>        
 </Window>
