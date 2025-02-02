@@ -10,7 +10,7 @@ namespace Mnogougolniki.Figures
 {
     public sealed class Circle : Shape
     {
-        public Circle(int x, int y) : base(x, y) { }
+        public Circle(int x, int y, Color c) : base(x, y, c) { }
 
         public override bool InSide(int nx, int ny)
         {
@@ -18,7 +18,7 @@ namespace Mnogougolniki.Figures
         }
         public override void Draw(DrawingContext context)
         {
-            Brush brush = new SolidColorBrush(Colors.White);
+            Brush brush = new SolidColorBrush(Colors.Black);
             Brush lineBrush = new SolidColorBrush(color);
             Pen pen = new(lineBrush, 2, lineCap: PenLineCap.Square);
             context.DrawEllipse(brush, pen, new Point(x, y), r, r);

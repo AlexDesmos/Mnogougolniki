@@ -13,12 +13,17 @@ namespace Mnogougolniki.Figures
     public sealed class Square : Shape
     {
         private Point point1, point2, point3, point4;   
-        private static float InR => r / (float)Math.Sqrt(2);
-        public Square(int x, int y) : base(x, y) { }
+        
+        public Square(int x, int y, Color c) : base(x, y, c) { }
 
         public override bool InSide(int newX, int newY)
         {
-           return x - InR <= newX && newY <= x + InR && y - InR <= newY && newY <= y + InR;
+            double InR = Math.Sqrt(r * r / 2);
+            if (Math.Abs(newX - x)<= InR && Math.Abs(newY - y) <= InR)
+            {
+                return true;
+            }
+            else{return false;}
         }
         public override void Draw(DrawingContext context)
         {

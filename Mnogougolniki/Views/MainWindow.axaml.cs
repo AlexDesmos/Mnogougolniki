@@ -13,24 +13,21 @@ public partial class MainWindow : Window
         
     }
     
-    private void OnPointerReleased(object? sender, PointerReleasedEventArgs e)
+    private void OnPointerReleased(object sender, Avalonia.Input.PointerReleasedEventArgs e)
     {
-        Controls? Control = this.Find<Controls>("Control");
+        Controls? Control = this.Find<Controls>("MyCustomControls");
         Control?.Release((int)e.GetPosition(Control).X, (int)e.GetPosition(Control).Y);
     }
     private void OnPointerMoved(object? sender, PointerEventArgs e)
     {
-        Controls? Control = this.Find<Controls>("Control");
+        Controls? Control = this.Find<Controls>("MyCustomControls");
         Control?.Move((int)e.GetPosition(Control).X, (int)e.GetPosition(Control).Y);
     }
     private void OnPointerPressed(object sender, PointerPressedEventArgs e)
     {
-        Controls? Control = this.Find<Controls>("Control");
+        Controls? Control = this.Find<Controls>("MyCustomControls");
         var point = e.GetCurrentPoint(sender as Control);
-        if (point.Properties.IsLeftButtonPressed)
-        {
-            Control?.LeftClick((int)e.GetPosition(Control).X, (int)e.GetPosition(Control).Y);
-        }
+            Control.LeftClick((int)e.GetPosition(Control).X, (int)e.GetPosition(Control).Y, point);
 
         if (point.Properties.IsRightButtonPressed)
         {
@@ -39,7 +36,7 @@ public partial class MainWindow : Window
     }
     private void Figures_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
-        Controls? Control = this.Find<Controls>("Control");
+        Controls? Control = this.Find<Controls>("MyCustomControls");
 
         int type = Figures.SelectedIndex;
         Control?.ChangeType(type);

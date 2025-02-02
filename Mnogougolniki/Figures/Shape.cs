@@ -13,13 +13,14 @@ namespace Mnogougolniki.Figures
         protected static readonly int r;
         protected int x, y;
         protected static Color color;
-        
+        public bool IsInConvexHull { get; set; } = true;
         public bool Moving {get; set;}
-        protected Shape(int x, int y)
+        protected Shape(int x, int y, Color c)
         {
             this.x = x;
             this.y = y;
-            
+            color = c;
+
         }
 
         static Shape()

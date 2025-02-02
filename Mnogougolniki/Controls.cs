@@ -10,8 +10,12 @@ namespace Mnogougolniki;
 
 public partial class Controls : UserControl
 {
-    private readonly List<Shape> shapes = [];
-    private int prevX, prevY;
+    private readonly List<Shape> shapes = [
+    new Circle(100, 100, Colors.OrangeRed),
+    new Square(150,200, Colors.Chartreuse),
+    new Triangle(300,300, Colors.Fuchsia)
+    ];
+    private int prevX, prevY, prevC;
     private int shapeType;
 
     public override void Render(DrawingContext context)
@@ -24,7 +28,7 @@ public partial class Controls : UserControl
         Console.WriteLine("Drawing in process...");
     }
 
-    public void LeftClick(int newX, int newY)
+    public void LeftClick(int newX, int newY, Avalonia.Input.PointerPoint point)
     {
         bool inside = false;
         foreach (var shape in shapes.Where(shape => shape.InSide(newX, newY)))
@@ -41,13 +45,13 @@ public partial class Controls : UserControl
             switch (shapeType)
             {
                 case 0:
-                    shapes.Add(new Circle(newX, newY));
+                    shapes.Add(new Circle(newX, newY, Colors.OrangeRed));
                     break;
                 case 1:
-                    shapes.Add(new Triangle(newX, newY));
+                    shapes.Add(new Triangle(newX, newY, Colors.Chartreuse));
                     break;
                 case 2:
-                    shapes.Add(new Square(newX, newY));
+                    shapes.Add(new Square(newX, newY, Colors.Cyan));
                     break;
             }
         }
@@ -67,6 +71,7 @@ public partial class Controls : UserControl
 
         InvalidateVisual();
     }
+
     public void Move(int newX, int newY)
     {
         foreach (var shape in shapes.Where(shape => shape.Moving))
@@ -80,6 +85,7 @@ public partial class Controls : UserControl
         prevY = newY;
         InvalidateVisual();
     }
+
     public void Release(int newX, int newY)
     {
         foreach (var shape in shapes.Where(shape => shape.Moving))
@@ -99,4 +105,148 @@ public partial class Controls : UserControl
     {
         shapeType = type;
     }
-}    
+
+    private void RemoveShapesInsideHull()
+    {
+        foreach (var shape in shapes.ToList().Where(shape => !shape.IsInConvexHull))
+        {
+            shapes.Remove(shape);
+        }
+
+        InvalidateVisual();
+    }
+
+    private void DrawConvexHullByDef(DrawingContext context)
+    {
+        foreach (var shape in shapes)
+        {
+            shape.IsInConvexHull = false;
+        }
+
+        int i = 0;
+        foreach (var s1 in shapes)
+        {
+            if (i == shapes.Count - 1)
+            {
+                break;
+            }
+
+            int j = 0;
+            foreach (var s2 in shapes)
+            {
+                if (j <= i)
+                {
+                    j++;
+                    continue;
+                }
+
+                int l = 0;
+                bool upper = false, lower = false;
+                double k = (double)(s2.Y - s1.Y) / (s2.X - s1.X);
+                double b = s2.Y - k * s2.X;
+                foreach (var s3 in shapes)
+                {
+                    if (l != i && l != j)
+                    {
+                        if (s1.X != s2.X)
+                        {
+                            if (s3.X * k + b > s3.Y)
+                            {
+                                lower = true;
+                            }
+                            else if (s3.X * k + b < s3.Y)
+                            {
+                                upper = true;
+                            }
+                        }
+                        else
+                        {
+                            if (s2.X > s3.X)
+                            {
+                                lower = true;
+                            }
+                            else if (s2.X < s3.X)
+                            {
+                                upper = true;
+                            }
+                        }
+                    }
+
+                    l++;
+                }
+
+            }
+        }
+    }
+    private void UpdatePointsInConvexHull()
+    {
+        foreach (var shape in shapes)
+        {
+            shape.IsInConvexHull = false;
+        }
+
+        int i = 0;
+        foreach (var s1 in shapes)
+        {
+            if (i == shapes.Count - 1)
+            {
+                break;
+            }
+
+            int j = 0;
+            foreach (var s2 in shapes)
+            {
+                if (j <= i)
+                {
+                    j++;
+                    continue;
+                }
+
+                int l = 0;
+                bool upper = false, lower = false;
+                double k = (double)(s2.Y - s1.Y) / (s2.X - s1.X);
+                double b = s2.Y - k * s2.X;
+                foreach (var s3 in shapes)
+                {
+                    if (l != i && l != j)
+                    {
+                        if (s1.X != s2.X)
+                        {
+                            if (s3.X * k + b > s3.Y)
+                            {
+                                lower = true;
+                            }
+                            else if (s3.X * k + b < s3.Y)
+                            {
+                                upper = true;
+                            }
+                        }
+                        else
+                        {
+                            if (s2.X > s3.X)
+                            {
+                                lower = true;
+                            }
+                            else if (s2.X < s3.X)
+                            {
+                                upper = true;
+                            }
+                        }
+                    }
+
+                    l++;
+                }
+
+                if (upper != lower || (upper == false && lower == false))
+                {
+                    s1.IsInConvexHull = true;
+                    s2.IsInConvexHull = true;
+                }
+
+                j++;
+            }
+
+            i++;
+        }
+    }
+}   

@@ -10,15 +10,20 @@ namespace Mnogougolniki.Figures
 {
     public sealed class Triangle : Shape
     {
-        public Triangle(int x = 0, int y= 0) : base(x, y) { }
+        public Triangle(int x, int y, Color c) : base(x, y, c) { }
         private Point point1, point2, point3;
-        private static double S => r * r * 0.25 * 3 * Math.Sqrt(3);
+        
         public override bool InSide(int nx, int ny)
         {
-            var pointClick = new Point(nx, ny);
-            return Math.Abs(S - Heron(point1, point2, point3)
-                              - Heron(point1, point3, point2)
-                              - Heron(point2, point3, pointClick)) <= 0.1;
+            double S = r * r * 0.75 * Math.Sqrt(3);
+            Point pointClick = new Point(nx, ny);
+            if (Math.Abs(S - (Heron(point1, point2, pointClick)
+                              + Heron(point1, point3, pointClick)
+                              + Heron(point2, point3, pointClick))) <= 50)
+            {
+                return true;
+            }
+            else{return false;}
         }
 
         public override void Draw(DrawingContext context)
@@ -32,13 +37,13 @@ namespace Mnogougolniki.Figures
             context.DrawLine(pen, point1, point3);
             context.DrawLine(pen, point2, point3);
         }
-        private static double Heron(Point p1, Point p2, Point p3)
+        private static double Heron(Point p1, Point p2, Point pointClick )
         {
-            var a = Point.Distance(p1, p2);
-            var b = Point.Distance(p1, p3);
-            var c = Point.Distance(p2, p3);
-            var p = (a + b + c) / 2;
-            return Math.Sqrt(p * (p - a) * (p - b) * (p - c));
+            double a = Point.Distance(p1, p2);
+            double b = Point.Distance(p1, pointClick);
+            double c = Point.Distance(p2, pointClick);
+            double p = (a + b + c) / 2;
+                return Math.Sqrt(p * (p - a) * (p - b) * (p - c));
         }
     }
     
