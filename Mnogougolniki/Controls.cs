@@ -25,7 +25,10 @@ public partial class Controls : UserControl
             shape.Draw(context);
         }
 
-        Console.WriteLine("Drawing in process...");
+        if (shapes.Count >= 3)
+        {
+            DrawConvexHullByDef(context);
+        }
     }
 
     public void LeftClick(int newX, int newY, Avalonia.Input.PointerPoint point)
@@ -146,6 +149,11 @@ public partial class Controls : UserControl
                 double b = s2.Y - k * s2.X;
                 foreach (var s3 in shapes)
                 {
+                    if ((s3.X == s2.X && s3.Y == s2.Y) || (s3.X == s1.X && s3.Y == s1.Y))
+                    {
+                        l++;
+                        continue;
+                    }
                     if (l != i && l != j)
                     {
                         if (s1.X != s2.X)
@@ -165,7 +173,7 @@ public partial class Controls : UserControl
                             {
                                 lower = true;
                             }
-                            else if (s2.X < s3.X)
+                            else if (s2.X <= s3.X)
                             {
                                 upper = true;
                             }
@@ -175,7 +183,20 @@ public partial class Controls : UserControl
                     l++;
                 }
 
+                if (upper != lower)
+                {
+                       
+                    Brush lineBrush = new SolidColorBrush(Colors.Blue);
+                    Pen pen = new(lineBrush, lineCap: PenLineCap.Square);
+                    var point1 = new Point(s1.X, s1.Y);
+                    var point2 = new Point(s2.X, s2.Y);
+                    context.DrawLine(pen, point1, point2);
+                }
+
+                j++;
             }
+
+            i++;
         }
     }
     private void UpdatePointsInConvexHull()

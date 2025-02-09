@@ -27,11 +27,15 @@ public partial class MainWindow : Window
     {
         Controls? Control = this.Find<Controls>("MyCustomControls");
         var point = e.GetCurrentPoint(sender as Control);
-            Control.LeftClick((int)e.GetPosition(Control).X, (int)e.GetPosition(Control).Y, point);
+           
 
         if (point.Properties.IsRightButtonPressed)
         {
             Control?.RightClick((int)e.GetPosition(Control).X, (int)e.GetPosition(Control).Y);
+        }
+        if (point.Properties.IsLeftButtonPressed)
+        {
+            Control?.LeftClick((int)e.GetPosition(Control).X, (int)e.GetPosition(Control).Y, point);
         }
     }
     private void Figures_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
