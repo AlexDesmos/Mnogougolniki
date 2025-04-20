@@ -12,21 +12,24 @@
         PointerMoved="OnPointerMoved"
         PointerReleased="OnPointerReleased"
         Title="Mnogougolniki">
-        
-        <Design.DataContext>
-                <vm:MainViewModel />
-        </Design.DataContext>
-        <DockPanel>
-                <Menu DockPanel.Dock="Top">
-                        <MenuItem Header="Figure type">
-                                <ListBox x:Name="Figures" SelectionChanged="Figures_OnSelectionChanged"></ListBox>
-                        </MenuItem>
-                        <MenuItem Header = "Test">
-                                <ListBox x:Name="Algorithms" SelectionChanged="Algorithms_OnSelectionChanged"></ListBox>
-                                <Button Click="Button_OnClickCheckPerformance">Check performance</Button>
-                        </MenuItem>
-                        
-                </Menu>
-                <Mnogougolniki:Controls Name="MyCustomControls"></Mnogougolniki:Controls> 
-        </DockPanel>        
+
+	<Design.DataContext>
+		<vm:MainViewModel />
+	</Design.DataContext>
+	<DockPanel>
+		<Menu DockPanel.Dock="Top">
+			<MenuItem Header="Figure type">
+				<ListBox x:Name="Figures" SelectionChanged="Figures_OnSelectionChanged"></ListBox>
+			</MenuItem>
+			<MenuItem Header = "Test">
+				<ListBox x:Name="Algorithms" SelectionChanged="Algorithms_OnSelectionChanged"></ListBox>
+				<Button Click="Button_OnClickCheckPerformance">Check performance</Button>
+				<Button Click="Button_Jarvis">Jarvis</Button>
+				<Button Click="Button_Def">By def</Button>
+
+			</MenuItem>
+
+		</Menu>
+		<Mnogougolniki:Controls Name="MyCustomControls"></Mnogougolniki:Controls>
+	</DockPanel>
 </Window>

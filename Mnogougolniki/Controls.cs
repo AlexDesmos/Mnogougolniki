@@ -13,15 +13,15 @@ namespace Mnogougolniki;
 
 public partial class Controls : UserControl
 {
-    private readonly List<Shape> shapes = [
+    private List<Shape> shapes = [
     new Circle(100, 100, Colors.OrangeRed),
     new Square(150,200, Colors.Chartreuse),
     new Triangle(300,300, Colors.Fuchsia)
     ];
     private int prevX, prevY, prevC;
     private int shapeType, _algorithmType;
-    
-    
+
+
     public override void Render(DrawingContext context)
     {
         foreach (var shape in shapes)
@@ -75,10 +75,10 @@ public partial class Controls : UserControl
                 switch (_algorithmType)
                 {
                     case 0:
-                        UpdatePointsInConvexHull();
+                        UpdatePointsInConvexHull(ref shapes);
                         break;
                     case 1:
-                        UpdateConvexHullJarvis();
+                        UpdateConvexHullJarvis(ref shapes);
                         break;
                 }
                 var drag = false;
@@ -145,7 +145,7 @@ public partial class Controls : UserControl
         prevY = newY;
         RemoveShapesInsideHull();
         InvalidateVisual();
-        
+
     }
 
     public void ChangeType(int type)
@@ -233,7 +233,7 @@ public partial class Controls : UserControl
 
                 if (upper != lower)
                 {
-                       
+
                     Brush lineBrush = new SolidColorBrush(Colors.Blue);
                     Pen pen = new(lineBrush, lineCap: PenLineCap.Square);
                     var point1 = new Point(s1.X, s1.Y);
@@ -249,7 +249,7 @@ public partial class Controls : UserControl
             i++;
         }
     }
-    private void UpdatePointsInConvexHull()
+    private void UpdatePointsInConvexHull(ref List<Shape> shapes)
     {
         foreach (var shape in shapes)
         {
@@ -406,7 +406,7 @@ public partial class Controls : UserControl
             }
         }
     }
-    private void UpdateConvexHullJarvis()
+    private void UpdateConvexHullJarvis(ref List<Shape> shapes)
     {
         foreach (var shape in shapes)
         {
@@ -476,30 +476,31 @@ public partial class Controls : UserControl
     }
     public Tuple<int, double>[] GetChartJarvis()
     {
-        int[] sizes = [10, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500];
-        Tuple<int, double>[] chart = new Tuple<int, double>[11];
+        Tuple<int, double>[] chart = new Tuple<int, double>[22];
         var rnd = new Random();
         var timer = new Stopwatch();
         List<Shape> shapes = [];
-        for (int j = 0; j < sizes.Length; ++j)
+        int index = 0;
+        for (int j = 10; j < 550; j += 25)
         {
             timer.Reset();
             shapes.Clear();
-            for (int i = 0; i < sizes[j]; ++i)
+            for (int i = 0; i < j; ++i)
             {
                 shapes.Add(new Circle(rnd.Next(1, 10000), rnd.Next(1, 10000), Colors.Blue));
             }
 
-            if (j == 0)
+            if (j == 10)
             {
-                UpdateConvexHullJarvis();
+                UpdateConvexHullJarvis(ref shapes);
             }
 
             timer.Start();
-            UpdateConvexHullJarvis();
+            UpdateConvexHullJarvis(ref shapes);
             timer.Stop();
             var elapsed = timer.Elapsed.TotalMilliseconds;
-            chart[j] = new(sizes[j], (int)(100 * elapsed));
+            chart[index] = new(j, elapsed);
+            index++;
         }
 
         return chart;
@@ -507,31 +508,33 @@ public partial class Controls : UserControl
 
     public Tuple<int, double>[] GetChartByDef()
     {
-        int[] sizes = [10, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500];
-        Tuple<int, double>[] chart = new Tuple<int, double>[11];
+
+        Tuple<int, double>[] chart = new Tuple<int, double>[22];
         var rnd = new Random();
         var timer = new Stopwatch();
         List<Shape> shapes = [];
-        for (int j = 0; j < sizes.Length; ++j)
+        int index = 0;
+        for (int j = 10; j < 550; j += 25)
         {
             timer.Reset();
             shapes.Clear();
-            for (int i = 0; i < sizes[j]; ++i)
+            for (int i = 0; i < j; ++i)
             {
                 shapes.Add(new Circle(rnd.Next(1, 10000), rnd.Next(1, 10000), Colors.Blue));
             }
 
             if (j == 0)
             {
-                UpdatePointsInConvexHull();
+                UpdatePointsInConvexHull(ref shapes);
             }
             timer.Start();
-            UpdatePointsInConvexHull();
+            UpdatePointsInConvexHull(ref shapes);
             timer.Stop();
             var elapsed = timer.Elapsed.TotalMilliseconds;
-            chart[j] = new(sizes[j], (int)(100 * elapsed));
+            chart[index] = new(j, elapsed);
+            index++;
         }
 
         return chart;
     }
-}   
+}

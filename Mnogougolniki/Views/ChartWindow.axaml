@@ -4,8 +4,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:Mnogougolniki="clr-namespace:Mnogougolniki"
         mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="400"
-        Width="550" Height="550"
+        Width="600" Height="600"
         x:Class="Mnogougolniki.Views.ChartWindow"
         Title="ChartWindow">
-    <Mnogougolniki:ChartControl Name="ChartControl" Loaded="ChartControl_OnLoaded"></Mnogougolniki:ChartControl>
+	<Mnogougolniki:ChartControl Name="MyChartControl" Loaded="ChartControl_OnLoaded"></Mnogougolniki:ChartControl>
 </Window>
