@@ -12,7 +12,7 @@ public class ChartControl : UserControl
     private Tuple<int, double>[]? _byDefChart;
     private bool _isChart;
     private int _chartToDraw = 3;
-    private int _scale = 1000;
+    private int _scale;
     public void SetArrays(Tuple<int, double>[]? jarv, Tuple<int, double>[]? def, int type)
     {
         _jarvisChart = jarv;
@@ -26,35 +26,27 @@ public class ChartControl : UserControl
     {
         Brush lineBrush = new SolidColorBrush(Colors.Blue);
         Pen pen = new(lineBrush, lineCap: PenLineCap.Square);
-        int oy = 500;
-        int ox = 30;
-        context.DrawLine(pen, new Point(ox, oy), new Point(oy, 500));
-        context.DrawLine(pen, new Point(ox, oy), new Point(ox, 50));
-        for (int y = 500; y > 50; y -= 50)
-        {
-            context.DrawLine(pen, new Point(28, y), new Point(32, y));
-        }
+        int oy = 550;
+        int ox = 20;
+        context.DrawLine(pen, new Point(ox, oy), new Point(oy, 550));
+        context.DrawLine(pen, new Point(ox, oy), new Point(ox, 30));
 
-        for (int x = 30; x < 500; x += 50)
-        {
-            context.DrawLine(pen, new Point(x, 502), new Point(x, 498));
-        }
         if (_isChart)
         {
             switch (_chartToDraw)
             {
                 case 1:
                     _scale = 1;
-                    DrawChart(context, _byDefChart, Colors.DarkOrange);
+                    DrawChart(context, _byDefChart, Colors.Chartreuse);
                     break;
                 case 2:
                     _scale = 1000;
-                    DrawChart(context, _jarvisChart, Colors.Blue);
+                    DrawChart(context, _jarvisChart, Colors.Fuchsia);
                     break;
                 case 3:
-                    _scale = 1000;
-                    DrawChart(context, _jarvisChart, Colors.Blue);
-                    DrawChart(context, _byDefChart, Colors.DarkOrange);
+                    _scale = 1;
+                    DrawChart(context, _jarvisChart, Colors.Fuchsia);
+                    DrawChart(context, _byDefChart, Colors.Chartreuse);
                     break;
             }
         }
@@ -66,42 +58,9 @@ public class ChartControl : UserControl
         Pen pen = new(lineBrush, lineCap: PenLineCap.Square);
         for (int i = 1; i < chart?.Length; ++i)
         {
-            var p1 = new Point(chart[i - 1].Item1 + 30, 500 - chart[i - 1].Item2);
-            var p2 = new Point(chart[i].Item1 + 30, 500 - chart[i].Item2);
+            var p1 = new Point(chart[i - 1].Item1 + 20, 550 - chart[i - 1].Item2 * _scale);
+            var p2 = new Point(chart[i].Item1 + 20, 550 - chart[i].Item2 * _scale);
             context.DrawLine(pen, p1, p2);
         }
-    }
-
-    private Tuple<int, double>[] CreateFuncChart(Func<int, double> func)
-    {
-        Tuple<int, double>[] chart = new Tuple<int, double>[50];
-        var timer = new Stopwatch();
-        var counter = 0;
-        var idx = 0;
-        timer.Start();
-        for (int n = 1; n <= 500; n += 10)
-        {
-            if (n == 1)
-            {
-                for (int x = 0; x < func(n); ++x)
-                {
-                    counter++;
-                }
-            }
-
-            timer.Reset();
-            timer.Start();
-            for (int x = 0; x < func(n); ++x)
-            {
-                counter++;
-            }
-
-            timer.Stop();
-            var elapsed = timer.Elapsed.TotalMilliseconds;
-            chart[idx] = new Tuple<int, double>(n, elapsed);
-            idx++;
-        }
-
-        return chart;
     }
 }

@@ -10,13 +10,13 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        Figures.ItemsSource = new[] {"Circle", "Triangle", "Square"};
+        Figures.ItemsSource = new[] { "Circle", "Triangle", "Square" };
         Figures.SelectedIndex = 1;
         Algorithms.ItemsSource = new[] { "By definition", "Jarvis" };
         Algorithms.SelectedIndex = 0;
-        
+
     }
-    
+
     private void OnPointerReleased(object sender, Avalonia.Input.PointerReleasedEventArgs e)
     {
         Controls? Control = this.Find<Controls>("MyCustomControls");
@@ -31,7 +31,7 @@ public partial class MainWindow : Window
     {
         Controls? Control = this.Find<Controls>("MyCustomControls");
         var point = e.GetCurrentPoint(sender as Control);
-           
+
 
         if (point.Properties.IsRightButtonPressed)
         {
@@ -51,7 +51,7 @@ public partial class MainWindow : Window
     }
     private void Algorithms_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
-        Controls? Control = this.Find<Controls>("MyCustomControl");
+        Controls? Control = this.Find<Controls>("MyCustomControls");
 
         int type = Algorithms.SelectedIndex;
         Control?.ChangeAlgorithmType(type);
@@ -59,23 +59,24 @@ public partial class MainWindow : Window
 
     private void Button_OnClickCheckPerformance(object? sender, RoutedEventArgs e)
     {
-        Controls? Control = this.Find<Controls>("Controls");
+        Controls? Control = this.Find<Controls>("MyCustomControls");
 
         var window = new ChartWindow(Control?.GetChartJarvis(), Control?.GetChartByDef(), 3);
         window.Show();
     }
 
-    private void Button_OnClickCheckJarvis(object? sender, RoutedEventArgs e)
+    private void Button_Jarvis(object? sender, RoutedEventArgs e)
     {
-        Controls? Control = this.Find<Controls>("Controls");
+        Controls? Control = this.Find<Controls>("MyCustomControls");
         var window = new ChartWindow(Control?.GetChartJarvis(), null, 2);
         window.Show();
     }
 
-    private void Button_OnClickCheckByDef(object? sender, RoutedEventArgs e)
+    private void Button_Def(object? sender, RoutedEventArgs e)
     {
-        Controls? Control = this.Find<Controls>("Controls");
+        Controls? Control = this.Find<Controls>("MyCustomControls");
         var window = new ChartWindow(null, Control?.GetChartByDef(), 1);
+        window.Show();
     }
 
 }
