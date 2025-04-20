@@ -1,5 +1,7 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Input;
+using System;
+using Avalonia.Interactivity;
 
 namespace Mnogougolniki.Views;
 
@@ -10,6 +12,8 @@ public partial class MainWindow : Window
         InitializeComponent();
         Figures.ItemsSource = new[] {"Circle", "Triangle", "Square"};
         Figures.SelectedIndex = 1;
+        Algorithms.ItemsSource = new[] { "By definition", "Jarvis" };
+        Algorithms.SelectedIndex = 0;
         
     }
     
@@ -45,4 +49,33 @@ public partial class MainWindow : Window
         int type = Figures.SelectedIndex;
         Control?.ChangeType(type);
     }
+    private void Algorithms_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        Controls? Control = this.Find<Controls>("MyCustomControl");
+
+        int type = Algorithms.SelectedIndex;
+        Control?.ChangeAlgorithmType(type);
+    }
+
+    private void Button_OnClickCheckPerformance(object? sender, RoutedEventArgs e)
+    {
+        Controls? Control = this.Find<Controls>("Controls");
+
+        var window = new ChartWindow(Control?.GetChartJarvis(), Control?.GetChartByDef(), 3);
+        window.Show();
+    }
+
+    private void Button_OnClickCheckJarvis(object? sender, RoutedEventArgs e)
+    {
+        Controls? Control = this.Find<Controls>("Controls");
+        var window = new ChartWindow(Control?.GetChartJarvis(), null, 2);
+        window.Show();
+    }
+
+    private void Button_OnClickCheckByDef(object? sender, RoutedEventArgs e)
+    {
+        Controls? Control = this.Find<Controls>("Controls");
+        var window = new ChartWindow(null, Control?.GetChartByDef(), 1);
+    }
+
 }

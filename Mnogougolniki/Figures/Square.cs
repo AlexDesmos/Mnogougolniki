@@ -14,9 +14,9 @@ namespace Mnogougolniki.Figures
     {
         private Point point1, point2, point3, point4;   
         
-        public Square(int x, int y, Color c) : base(x, y, c) { }
+        public Square(double x, double y, Color c) : base(x, y, c) { }
 
-        public override bool InSide(int newX, int newY)
+        public override bool InSide(double newX, double newY)
         {
             double InR = Math.Sqrt(r * r / 2);
             if (Math.Abs(newX - x)<= InR && Math.Abs(newY - y) <= InR)

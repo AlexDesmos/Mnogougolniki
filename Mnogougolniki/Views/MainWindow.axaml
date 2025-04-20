@@ -21,6 +21,11 @@
                         <MenuItem Header="Figure type">
                                 <ListBox x:Name="Figures" SelectionChanged="Figures_OnSelectionChanged"></ListBox>
                         </MenuItem>
+                        <MenuItem Header = "Test">
+                                <ListBox x:Name="Algorithms" SelectionChanged="Algorithms_OnSelectionChanged"></ListBox>
+                                <Button Click="Button_OnClickCheckPerformance">Check performance</Button>
+                        </MenuItem>
+                        
                 </Menu>
                 <Mnogougolniki:Controls Name="MyCustomControls"></Mnogougolniki:Controls> 
         </DockPanel>        

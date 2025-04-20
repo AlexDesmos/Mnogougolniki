@@ -10,9 +10,9 @@ namespace Mnogougolniki.Figures
 {
     public sealed class Circle : Shape
     {
-        public Circle(int x, int y, Color c) : base(x, y, c) { }
+        public Circle(double x, double y, Color c) : base(x, y, c) { }
 
-        public override bool InSide(int nx, int ny)
+        public override bool InSide(double nx, double ny)
         {
             return (x - nx) * (x - nx) + (y - ny) * (y - ny) <= r * r;
         }

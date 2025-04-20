@@ -9,13 +9,13 @@ namespace Mnogougolniki.Figures
 {
     public abstract class Shape
     {
-        public abstract bool InSide(int nx, int ny);
+        public abstract bool InSide(double nx, double ny);
         protected static readonly int r;
-        protected int x, y;
+        protected double x, y;
         protected static Color color;
         public bool IsInConvexHull { get; set; } = true;
         public bool Moving {get; set;}
-        protected Shape(int x, int y, Color c)
+        protected Shape(double x, double y, Color c)
         {
             this.x = x;
             this.y = y;
@@ -29,13 +29,13 @@ namespace Mnogougolniki.Figures
             color = Colors.Chocolate;
         }
 
-        public int X
+        public double X
         {
             get { return x; }
             set { x = value; }
         }
 
-        public int Y
+        public double Y
         {
             get { return y; }
             set { y = value; }

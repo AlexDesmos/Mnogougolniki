@@ -10,17 +10,21 @@ namespace Mnogougolniki.Figures
 {
     public sealed class Triangle : Shape
     {
-        public Triangle(int x, int y, Color c) : base(x, y, c) { }
+        public Triangle(double x, double y, Color c) : base(x, y, c) { }
         private Point point1, point2, point3;
         double S = r * r * 0.75 * Math.Sqrt(3);
+        private double r2 = r*(double)Math.Sqrt(3)/2;
+        private double r3 =(double)r / 2;
         
-        public override bool InSide(int nx, int ny)
+        public override bool InSide(double nx, double ny)
         {
-            
+            Point p1 = new Point(x, y - r);
+            Point p2 = new Point(x - r2, y + r3);
+            Point p3 = new Point(x + r2, y + r3);
             Point pointClick = new Point(nx, ny);
-            if (Math.Abs(S - (Heron(point1, point2, pointClick)
-                              + Heron(point1, point3, pointClick)
-                              + Heron(point2, point3, pointClick))) <= 1000)
+            if (Math.Abs(S - (Heron(p1, p2, pointClick)
+                              + Heron(p1, p3, pointClick)
+                              + Heron(p2, p3, pointClick))) <= 1)
             {
                 return true;
             }
@@ -32,8 +36,8 @@ namespace Mnogougolniki.Figures
             Brush lineBrush = new SolidColorBrush(color);
             Pen pen = new(lineBrush, 2, lineCap: PenLineCap.Square);
             var point1 = new Point(x, y - r);
-            var point2 = new Point(x - r * (double)Math.Sqrt(3) / 2, y + (double)r / 2);
-            var point3 = new Point(x + r * (double)Math.Sqrt(3) / 2, y + (double)r / 2);
+            var point2 = new Point(x - r2, y + r3);
+            var point3 = new Point(x + r2, y + r3);
             context.DrawLine(pen, point1, point2);
             context.DrawLine(pen, point1, point3);
             context.DrawLine(pen, point2, point3);

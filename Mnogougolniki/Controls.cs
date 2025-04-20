@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Diagnostics;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 using Mnogougolniki.Figures;
-
+using Point = Avalonia.Point;
+using System.Drawing;
+using Mnogougolniki.Figures;
 namespace Mnogougolniki;
 
 public partial class Controls : UserControl
@@ -16,8 +19,9 @@ public partial class Controls : UserControl
     new Triangle(300,300, Colors.Fuchsia)
     ];
     private int prevX, prevY, prevC;
-    private int shapeType;
-
+    private int shapeType, _algorithmType;
+    
+    
     public override void Render(DrawingContext context)
     {
         foreach (var shape in shapes)
@@ -27,7 +31,15 @@ public partial class Controls : UserControl
 
         if (shapes.Count >= 3)
         {
-            DrawConvexHullByDef(context);
+            switch (_algorithmType)
+            {
+                case 0:
+                    DrawConvexHullByDef(context);
+                    break;
+                case 1:
+                    DrawConvexHullJarvis(context);
+                    break;
+            }
         }
     }
 
@@ -56,6 +68,36 @@ public partial class Controls : UserControl
                 case 2:
                     shapes.Add(new Square(newX, newY, Colors.Cyan));
                     break;
+            }
+
+            if (shapes.Count >= 3)
+            {
+                switch (_algorithmType)
+                {
+                    case 0:
+                        UpdatePointsInConvexHull();
+                        break;
+                    case 1:
+                        UpdateConvexHullJarvis();
+                        break;
+                }
+                var drag = false;
+                if (!shapes.Last().IsInConvexHull)
+                {
+                    drag = true;
+                    shapes.Remove(shapes.Last());
+                    foreach (var shape in shapes)
+                    {
+                        shape.Moving = true;
+                    }
+                    prevX = newX;
+                    prevY = newY;
+                }
+
+                if (!drag)
+                {
+                    RemoveShapesInsideHull();
+                }
             }
         }
 
@@ -101,7 +143,9 @@ public partial class Controls : UserControl
 
         prevX = newX;
         prevY = newY;
+        RemoveShapesInsideHull();
         InvalidateVisual();
+        
     }
 
     public void ChangeType(int type)
@@ -109,6 +153,10 @@ public partial class Controls : UserControl
         shapeType = type;
     }
 
+    public void ChangeAlgorithmType(int type)
+    {
+        _algorithmType = type;
+    }
     private void RemoveShapesInsideHull()
     {
         foreach (var shape in shapes.ToList().Where(shape => !shape.IsInConvexHull))
@@ -190,6 +238,8 @@ public partial class Controls : UserControl
                     Pen pen = new(lineBrush, lineCap: PenLineCap.Square);
                     var point1 = new Point(s1.X, s1.Y);
                     var point2 = new Point(s2.X, s2.Y);
+                    s1.IsInConvexHull = true;
+                    s2.IsInConvexHull = true;
                     context.DrawLine(pen, point1, point2);
                 }
 
@@ -269,5 +319,219 @@ public partial class Controls : UserControl
 
             i++;
         }
+    }
+    private static double GetCoors(Shape a, Shape b, Shape c)
+    {
+        var ba = (a.X - b.X, a.Y - b.Y);
+        var bc = (c.X - b.X, c.Y - b.Y);
+        var scalarProduct = ba.Item1 * bc.Item1 + ba.Item2 * bc.Item2;
+        var baLen = Math.Sqrt(ba.Item1 * ba.Item1 + ba.Item2 * ba.Item2);
+        var bcLen = Math.Sqrt(bc.Item1 * bc.Item1 + bc.Item2 * bc.Item2);
+        double coors = scalarProduct / (baLen * bcLen);
+        return coors;
+    }
+    private void DrawConvexHullJarvis(DrawingContext context)
+    {
+        foreach (var shape in shapes)
+        {
+            shape.IsInConvexHull = false;
+        }
+
+        Brush lineBrush = new SolidColorBrush(Colors.Fuchsia);
+        Pen pen = new(lineBrush, lineCap: PenLineCap.Square);
+        double minX = Int32.MaxValue;
+        double minY = Int32.MinValue;
+        Shape first = new Circle(0, 0, Colors.Blue);
+        foreach (var s in shapes)
+        {
+            if (s.Y > minY)
+            {
+                minY = s.Y;
+                minX = s.X;
+                first = s;
+            }
+            else if (Math.Abs(s.Y - minY) < 1e-4)
+            {
+                if (s.X < minX)
+                {
+                    minY = s.Y;
+                    minX = s.X;
+                    first = s;
+                }
+            }
+        }
+
+        shapes.Find(s => s == first)!.IsInConvexHull = true;
+        Shape mid = new Circle(first.X - 0.1, first.Y, Colors.Blue);
+        Shape end = mid;
+        double maxCoors = -2;
+        foreach (var s in shapes)
+        {
+            if (s == mid || s == first) continue;
+            if (maxCoors < GetCoors(first, mid, s))
+            {
+                end = s;
+                maxCoors = GetCoors(first, mid, s);
+            }
+        }
+
+        mid = end;
+        shapes.Find(i => i == end)!.IsInConvexHull = true;
+        var p1 = new Point(first.X, first.Y);
+        var p2 = new Point(mid.X, mid.Y);
+        context.DrawLine(pen, p1, p2);
+        var start = first;
+        while (true)
+        {
+            double minCoors = 2;
+            foreach (var s in shapes)
+            {
+                if (s == start || s == mid) continue;
+                if (minCoors > GetCoors(start, mid, s))
+                {
+                    end = s;
+                    minCoors = GetCoors(start, mid, s);
+                }
+            }
+
+            start = mid;
+            mid = end;
+            shapes.Find(i => i == end)!.IsInConvexHull = true;
+            p1 = new Point(start.X, start.Y);
+            p2 = new Point(mid.X, mid.Y);
+            context.DrawLine(pen, p1, p2);
+            if (end == first)
+            {
+                break;
+            }
+        }
+    }
+    private void UpdateConvexHullJarvis()
+    {
+        foreach (var shape in shapes)
+        {
+            shape.IsInConvexHull = false;
+        }
+
+        double minX = Int32.MaxValue;
+        double minY = Int32.MinValue;
+        Shape first = new Circle(0, 0, Colors.Blue);
+        foreach (var s in shapes)
+        {
+            if (s.Y > minY)
+            {
+                minY = s.Y;
+                minX = s.X;
+                first = s;
+            }
+            else if (Math.Abs(s.Y - minY) < 1e-4)
+            {
+                if (s.X < minX)
+                {
+                    minY = s.Y;
+                    minX = s.X;
+                    first = s;
+                }
+            }
+        }
+
+        shapes.Find(s => s == first)!.IsInConvexHull = true;
+        Shape mid = new Circle(first.X - 0.1, first.Y, Colors.Blue);
+        Shape end = mid;
+        double maxCoors = -2;
+        foreach (var s in shapes)
+        {
+            if (s == mid || s == first) continue;
+            if (maxCoors < GetCoors(first, mid, s))
+            {
+                end = s;
+                maxCoors = GetCoors(first, mid, s);
+            }
+        }
+
+        mid = end;
+        shapes.Find(i => i == end)!.IsInConvexHull = true;
+        var start = first;
+        while (true)
+        {
+            double minCoors = 2;
+            foreach (var s in shapes)
+            {
+                if (s == start || s == mid) continue;
+                if (minCoors > GetCoors(start, mid, s))
+                {
+                    end = s;
+                    minCoors = GetCoors(start, mid, s);
+                }
+            }
+
+            start = mid;
+            mid = end;
+            shapes.Find(i => i == end)!.IsInConvexHull = true;
+            if (end == first)
+            {
+                break;
+            }
+        }
+    }
+    public Tuple<int, double>[] GetChartJarvis()
+    {
+        int[] sizes = [10, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500];
+        Tuple<int, double>[] chart = new Tuple<int, double>[11];
+        var rnd = new Random();
+        var timer = new Stopwatch();
+        List<Shape> shapes = [];
+        for (int j = 0; j < sizes.Length; ++j)
+        {
+            timer.Reset();
+            shapes.Clear();
+            for (int i = 0; i < sizes[j]; ++i)
+            {
+                shapes.Add(new Circle(rnd.Next(1, 10000), rnd.Next(1, 10000), Colors.Blue));
+            }
+
+            if (j == 0)
+            {
+                UpdateConvexHullJarvis();
+            }
+
+            timer.Start();
+            UpdateConvexHullJarvis();
+            timer.Stop();
+            var elapsed = timer.Elapsed.TotalMilliseconds;
+            chart[j] = new(sizes[j], (int)(100 * elapsed));
+        }
+
+        return chart;
+    }
+
+    public Tuple<int, double>[] GetChartByDef()
+    {
+        int[] sizes = [10, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500];
+        Tuple<int, double>[] chart = new Tuple<int, double>[11];
+        var rnd = new Random();
+        var timer = new Stopwatch();
+        List<Shape> shapes = [];
+        for (int j = 0; j < sizes.Length; ++j)
+        {
+            timer.Reset();
+            shapes.Clear();
+            for (int i = 0; i < sizes[j]; ++i)
+            {
+                shapes.Add(new Circle(rnd.Next(1, 10000), rnd.Next(1, 10000), Colors.Blue));
+            }
+
+            if (j == 0)
+            {
+                UpdatePointsInConvexHull();
+            }
+            timer.Start();
+            UpdatePointsInConvexHull();
+            timer.Stop();
+            var elapsed = timer.Elapsed.TotalMilliseconds;
+            chart[j] = new(sizes[j], (int)(100 * elapsed));
+        }
+
+        return chart;
     }
 }   
